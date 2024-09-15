@@ -1,60 +1,51 @@
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
-#include <time.h>
 #include <string.h>
+#include <time.h>
 
-#define maximo_De_Livros 300
-#define maximo_De_Nomes 100
+#define maximo_De_Livros 20
+#define maximo_Letras_Livro 300
 #define maximo_De_Usuarios 20
+#define maximo_Letras_Usuarios 100
 
-#define RED     "\x1b[31m"
-#define GREEN   "\x1b[32m"
-#define CYAN    "\x1b[36m"
-#define RESET   "\x1b[0m"
+#define RED "\x1b[31m"
+#define GREEN "\x1b[32m"
+#define CYAN "\x1b[36m"
+#define RESET "\x1b[0m"
 
-char nome_De_Usuario[maximo_De_Usuarios][maximo_De_Nomes];
-char titulo_Livros[maximo_De_Usuarios][maximo_De_Livros][maximo_De_Nomes];
+char nome_De_Usuario[maximo_De_Usuarios][maximo_Letras_Livro];
+char titulo_Livros[maximo_De_Usuarios][maximo_Letras_Livro][maximo_Letras_Livro];
 int Id_Usario[maximo_De_Usuarios];
-int quantidade_De_Usuarios = 0;
+int escolhaLivro, quantidade_De_Usuarios = 0;
 int quantidade_De_Livros[maximo_De_Usuarios];
-int livros_Lidos[maximo_De_Usuarios][maximo_De_Livros];
+int livros_Lidos[maximo_De_Usuarios][maximo_Letras_Livro];
 
-void mostreerro(const char *mensagem) {
-  printf(RED "ERRO: %s\n" RESET, mensagem);
-}
+void mostreerro(const char *mensagem) { printf(RED "ERRO: %s\n" RESET, mensagem); }
 
-int idAleatorio() {
-  return rand() % 10001;
-}
+int idAleatorio() { return rand() % 10001; }
 
-int contadorLivrosUsuario(int usuario) {
-  return Id_Usario[usuario] == usuario ? quantidade_De_Livros[usuario] : 0;
-}
+int contadorLivrosUsuario(int usuario) { return Id_Usario[usuario] == usuario ? quantidade_De_Livros[usuario] : 0; }
 
 int contadorLidos(int usuario) {
   int contar = 0;
-
   for (int i = 0; i < quantidade_De_Livros[usuario]; i++) {
     contar += livros_Lidos[usuario][i];
   }
-
   return contar;
 }
 
 int autenticar_Usuario() {
-  char tipo_De_Login[maximo_De_Nomes];
+  char tipo_De_Login[maximo_Letras_Livro];
   printf(CYAN "Digite o nome ou ID do usuário: \n" RESET);
-  fgets(tipo_De_Login, maximo_De_Nomes, stdin);
+  fgets(tipo_De_Login, maximo_Letras_Livro, stdin);
   tipo_De_Login[strcspn(tipo_De_Login, "\n")] = 0;
 
   for (int i = 0; i < quantidade_De_Usuarios; i++) {
-    if ((tipo_De_Login[0] >= '0' && tipo_De_Login[0] <= '9' && Id_Usario[i] == atoi(tipo_De_Login)) ||
-        strcmp(nome_De_Usuario[i], tipo_De_Login) == 0) {
+    if ((tipo_De_Login[0] >= '0' && tipo_De_Login[0] <= '9' && Id_Usario[i] == atoi(tipo_De_Login)) || strcmp(nome_De_Usuario[i], tipo_De_Login) == 0) {
       return i;
     }
   }
-
   return -1;
 }
 
@@ -64,22 +55,20 @@ int verificar_Usuario_Existente(const char *nome) {
       return i;
     }
   }
-
   return -1;
 }
 
 void cadastrar_Usuario() {
   if (quantidade_De_Usuarios < maximo_De_Usuarios) {
-    char nome[maximo_De_Nomes];
+    char nome[maximo_Letras_Livro];
     printf(CYAN "Digite o nome do usuário: " RESET);
-    fgets(nome, maximo_De_Nomes, stdin);
+    fgets(nome, maximo_Letras_Livro, stdin);
     nome[strcspn(nome, "\n")] = 0;
 
     if (verificar_Usuario_Existente(nome) != -1) {
       mostreerro("Usuário já cadastrado.");
       return;
     }
-
     strcpy(nome_De_Usuario[quantidade_De_Usuarios], nome);
     Id_Usario[quantidade_De_Usuarios] = idAleatorio();
     quantidade_De_Livros[quantidade_De_Usuarios] = 0;
@@ -92,17 +81,17 @@ void cadastrar_Usuario() {
 }
 
 void cadastrar_Livro(int usuario_Online) {
-  if (quantidade_De_Livros[usuario_Online] < 20) {
-    while (quantidade_De_Livros[usuario_Online] < 20) {
+  if (quantidade_De_Livros[usuario_Online] < maximo_De_Livros) {
+    while (quantidade_De_Livros[usuario_Online] < maximo_De_Livros) {
       printf(CYAN "Insira o título do livro %d (0 para retornar ao menu): " RESET, quantidade_De_Livros[usuario_Online] + 1);
-      fgets(titulo_Livros[usuario_Online][quantidade_De_Livros[usuario_Online]], maximo_De_Nomes, stdin);
-      titulo_Livros[usuario_Online][quantidade_De_Livros[usuario_Online]][strcspn(titulo_Livros[usuario_Online][quantidade_De_Livros[usuario_Online]], "\n")] = 0;
+      fgets(titulo_Livros[usuario_Online][quantidade_De_Livros[usuario_Online]], maximo_Letras_Livro, stdin);
+      int posicaoEnter = strcspn(titulo_Livros[usuario_Online][quantidade_De_Livros[usuario_Online]], "\n");
+      titulo_Livros[usuario_Online][quantidade_De_Livros[usuario_Online]][posicaoEnter] = 0;
       if (strcmp(titulo_Livros[usuario_Online][quantidade_De_Livros[usuario_Online]], "0") == 0) {
         break;
       }
       quantidade_De_Livros[usuario_Online]++;
     }
-
     printf(GREEN "\n-------------------------------\n         LIVROS CADASTRADOS!\n-------------------------------" RESET);
   } else {
     mostreerro("Limite de livros atingido.");
@@ -110,21 +99,16 @@ void cadastrar_Livro(int usuario_Online) {
 }
 
 void procurar_Livro(int usuario_Online) {
-  int escolhaProcurarLivos, escolhaLivro;
-  printf(CYAN "\n-------------------------------\n         PROCURAR LIVROS\n-------------------------------" RESET
-         "\nVocê deseja:\n1. Exibir Livros / Marcar Livros\n2. Exibir Livros Lidos\n3. Retornar ao Menu"
-         CYAN "\n-------------------------------\nInsira sua opção: " RESET);
+  int escolhaProcurarLivos;
+  printf(CYAN "\n-------------------------------\n         PROCURAR LIVROS\n-------------------------------" RESET "\nVocê deseja:\n1. Exibir Livros\n2. Exibir Livros Lidos\n3. Retornar ao Menu" CYAN "\n-------------------------------\nInsira sua opção: " RESET);
   scanf("%d", &escolhaProcurarLivos);
   getchar();
 
   switch (escolhaProcurarLivos) {
     case 1:
-      printf(CYAN "\n-------------------------------\n         LISTA DE LIVROS\n-------------------------------\n" RESET);
-
       for (int i = 0; i < quantidade_De_Livros[usuario_Online]; i++) {
         printf("%d. %s%s\n", i + 1, titulo_Livros[usuario_Online][i], livros_Lidos[usuario_Online][i] ? " (Lido)" : "");
       }
-
       do {
         printf(CYAN "\nVocê tem %d livros na sua biblioteca.\nInsira o número do livro que deseja marcar como lido (ou 0 para voltar ao menu): ", quantidade_De_Livros[usuario_Online], RESET);
         scanf("%d", &escolhaLivro);
@@ -134,10 +118,9 @@ void procurar_Livro(int usuario_Online) {
           livros_Lidos[usuario_Online][escolhaLivro - 1] = 1;
           printf(GREEN "Livro '%s' marcado como lido.\n" RESET, titulo_Livros[usuario_Online][escolhaLivro - 1]);
         } else if (escolhaLivro != 0) {
-          printf("\nOpção Inválida!");
+          mostreerro("\nOpção Inválida.");
         }
       } while (escolhaLivro != 0);
-
       break;
 
     case 2:
@@ -146,16 +129,39 @@ void procurar_Livro(int usuario_Online) {
           printf("%d. %s (Lido)\n", i + 1, titulo_Livros[usuario_Online][i]);
         }
       }
-
       printf(CYAN "\nInsira ENTER para voltar ao menu..." RESET);
       getchar();
       break;
   }
 }
 
+void remover_Livro(int usuario_Online) {
+  int escolhaLivro;
+  printf(CYAN "\n-------------------------------\n         REMOVER LIVRO\n-------------------------------\n" RESET);
+  for (int i = 0; i < quantidade_De_Livros[usuario_Online]; i++) {
+    printf("%d. %s%s\n", i + 1, titulo_Livros[usuario_Online][i], livros_Lidos[usuario_Online][i] ? " (Lido)" : "");
+  }
+  do {
+    printf(CYAN "\nEscolha o número do livro que você quer " RED "remover" CYAN " (ou 0 para voltar ao menu): " RESET);
+    scanf("%d", &escolhaLivro);
+    getchar();
+
+    if (escolhaLivro > 0 && escolhaLivro <= quantidade_De_Livros[usuario_Online]) {
+      for (int i = escolhaLivro - 1; i < quantidade_De_Livros[usuario_Online] - 1; i++) {
+        strcpy(titulo_Livros[usuario_Online][i], titulo_Livros[usuario_Online][i + 1]);
+        livros_Lidos[usuario_Online][i] = livros_Lidos[usuario_Online][i + 1];
+      }
+      quantidade_De_Livros[usuario_Online]--;
+      printf(GREEN "\nLivro removido com sucesso.\n" RESET);
+    } else if (escolhaLivro != 0) {
+      mostreerro("\nOpção Inválida.");
+    }
+  } while (escolhaLivro != 0);
+}
+
 int menuBiblioteca(char *nome_De_Usuario) {
   int escolhaMenuBiblioteca;
-  printf(CYAN "\n-------------------------------\n         MENU BIBLIOTECA\n-------------------------------\nOlá, %s!\nO que deseja fazer?" RESET "\n1. Cadastrar Livros\n2. Procurar Livros\n3. Retornar ao Menu" CYAN "\n-------------------------------\nInsira sua opção: " RESET, nome_De_Usuario);
+  printf(CYAN "\n-------------------------------\n         MENU BIBLIOTECA\n-------------------------------\nOlá, %s!\nO que deseja fazer?" RESET "\n1. Cadastrar Livros\n2. Procurar Livros\n3. Remover Livros\n4. Retornar ao Menu" CYAN "\n-------------------------------\nInsira sua opção: " RESET, nome_De_Usuario);
   scanf("%d", &escolhaMenuBiblioteca);
   getchar();
   return escolhaMenuBiblioteca;
@@ -163,9 +169,7 @@ int menuBiblioteca(char *nome_De_Usuario) {
 
 int menuOpcoes() {
   int escolhaMenu;
-  printf(CYAN "\n-------------------------------\n         MENU DE OPÇÕES\n-------------------------------\nOlá! Bem-vindo(a) à biblioteca pessoal.\nO que deseja realizar?\n" RESET
-         "\n1. Cadastrar Usuário\n2. Autenticar Usuário\n3. Sair do Menu"
-         CYAN "\n-------------------------------\nInsira sua opção: " RESET);
+  printf(CYAN "\n-------------------------------\n         MENU DE OPÇÕES\n-------------------------------\nOlá! Bem-vindo(a) à biblioteca pessoal.\nO que deseja realizar?\n" RESET "\n1. Cadastrar Usuário\n2. Autenticar Usuário\n3. Sair do Menu" CYAN "\n-------------------------------\nInsira sua opção: " RESET);
   scanf("%d", &escolhaMenu);
   getchar();
   printf(RESET);
@@ -195,11 +199,15 @@ int main() {
           while (1) {
             int escolha = menuBiblioteca(nome_De_Usuario[usuario_Online]);
 
-            if (escolha == 1)cadastrar_Livro(usuario_Online);
+            if (escolha == 1)
+              cadastrar_Livro(usuario_Online);
             else if (escolha == 2) {
               system("clear || cls");
               procurar_Livro(usuario_Online);
             } else if (escolha == 3) {
+              system("clear || cls");
+              remover_Livro(usuario_Online);
+            } else if (escolha == 4) {
               system("clear || cls");
               break;
             }
@@ -207,7 +215,6 @@ int main() {
         } else {
           mostreerro("Usuário não encontrado.");
         }
-
         break;
 
       case 3:
@@ -215,10 +222,9 @@ int main() {
         break;
 
       default:
-        mostreerro("Opção inválida!");
+        mostreerro("Opção inválida.");
     }
   } while (escolhaMenu != 3);
 
   return 0;
 }
-
