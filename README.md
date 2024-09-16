@@ -28,4 +28,5 @@ Este é um projeto colaborativo de faculdade para a gestão de uma biblioteca pe
 1. **Compile o código**:
 
    ```bash
-   gcc -o biblioteca biblioteca.c
+   gcc -o biblioteca BibliotecaPessoal.c
+
