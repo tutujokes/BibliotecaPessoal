@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Este é um projeto colaborativo de faculdade para a gestão de uma biblioteca pessoal. O programa permite aos usuários cadastrar novos livros, marcar livros como lidos, remover livros e gerenciar a biblioteca pessoal de forma interativa. A interface é baseada em texto e utiliza cores para facilitar a visualização das mensagens.
+Este é um projeto colaborativo, realizado por **Arthur Henrique, Renan Moreira e Luis Gustavo** para a cadeira de Fundamentos de Programação de Computadores, do curso de Sistemas de Informação - IFMA, para a gestão de uma biblioteca pessoal. O programa permite aos usuários cadastrar novos livros, marcar livros como lidos, remover livros e gerenciar a biblioteca pessoal de forma interativa. A interface é baseada em texto e utiliza cores para facilitar a visualização das mensagens.
 
 ## Funcionalidades
 
